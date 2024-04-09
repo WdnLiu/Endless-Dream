@@ -98,6 +98,14 @@ set( Framework
     src/input.h
     src/synth.cpp
     src/synth.h
+    src/gameMap.cpp
+    src/gameMap.h
+    src/json.hpp
+    src/player.cpp
+    src/player.h
+    src/sprite.h
+    src/sprite.cpp
+    src/camera.h
 )
 source_group( "framework" FILES ${Framework} )
 set( ALL_FILES ${ALL_FILES} ${Framework} )

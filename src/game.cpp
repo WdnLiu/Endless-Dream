@@ -5,6 +5,7 @@
 #include "gameMap.h"
 #include "player.h"
 #include "camera.h"
+#include "entity.h"
 #include <cmath>
 
 Game* Game::instance = NULL;
@@ -17,9 +18,10 @@ GameMap map;
 Color bgcolor(130, 80, 100);
 Vector2 target;
 Camera camera;
+Entity e = Entity();
 
 // Vector2 playerPosition = Vector2(50.0f, 50.0f);
-Player player = Player();
+Player player = Player(Vector2(15, 20), 1, 60.0f);
 // Vector2 offsetCam = Vector2(0, 0);
 int spriteNum = 0;
 
@@ -87,8 +89,7 @@ void Game::render(void)
 	// framebuffer.drawText( "Hello World", 0, 0, font );				//draws some text using a bitmap font in an image (assuming every char is 7x9)
 	framebuffer.drawText( toString(camera.position.x) + ':' + toString(camera.position.y), 1, 10, minifont,4,6);	//draws some text using a bitmap font in an image (assuming every char is 4x6)
 	framebuffer.drawText( toString(player.position.x) + ':' + toString(player.position.y), 1, 17, minifont,4,6);	//draws some text using a bitmap font in an image (assuming every char is 4x6)
-	framebuffer.drawText( toString(player.rolling), 1, 25, minifont,4,6);	//draws some text using a bitmap font in an image (assuming every char is 4x6)
-
+	framebuffer.drawText( toString(player.life), 1, 25, minifont,4,6);	//draws some text using a bitmap font in an image (assuming every char is 4x6)
 
 	// framebuffer.drawImage( sprite, framebuffer.width/2.0 - offsetCam.x, framebuffer.height/2.0 - offsetCam.y, Area(spriteNum*15, direction*18, 15, 20) );	//draws only a part of an image
 	if (player.rolling) {
@@ -96,6 +97,13 @@ void Game::render(void)
 		spriteNum = int ((time-startRoll)*20) %9;
 	} 
 	else player.animate(framebuffer, time, camera);
+
+	if (player.rollCD) player.rollCD = (int(time-startRoll) == 5) ? false : true;
+
+	if (e.isUsed) {
+		e.updatePos(Game::instance->elapsed_time);
+		e.drawEntity(framebuffer, camera);
+	}
 
 	//send image to screen
 	showFramebuffer(&framebuffer);
@@ -127,11 +135,15 @@ void Game::update(double seconds_elapsed)
 		playerSpeed.x -= 1;
 		player.direction = Player::LEFT_FACING;
 	}
-	if (Input::wasKeyPressed(SDL_SCANCODE_Z) && !player.rolling)
+	if (Input::wasKeyPressed(SDL_SCANCODE_Z) && !player.rollCD)
 	{
 		player.rolling = true;
 		startRoll = time;
 		spriteNum = 0;
+		player.rollCD = true;
+	}
+	if (Input::wasKeyPressed(SDL_SCANCODE_A)) {
+		e = Entity(player);
 	}
 
 	target = player.position+playerSpeed;
@@ -148,11 +160,16 @@ void Game::update(double seconds_elapsed)
 	// camera.offset.y = clamp(camera.offset.y + playerSpeed.y*30*seconds_elapsed, -20, 20);
 
 	if (player.moving) {
-		player.position.x = clamp(player.position.x + playerSpeed.x*60.0f*seconds_elapsed, 15, 450);
-		player.position.y = clamp(player.position.y + playerSpeed.y*60.0f*seconds_elapsed, 0, 285);
+		player.position.x = clamp(player.position.x + playerSpeed.x*player.speed*seconds_elapsed, 15, 450);
+		player.position.y = clamp(player.position.y + playerSpeed.y*player.speed*seconds_elapsed, 0, 285);
 	}
 	camera.position.x = clamp(player.position.x, 15, 500);
 	camera.position.y = clamp(player.position.y, 0, 335);
+
+	if (player.inHitbox(e.position) && e.isUsed) {
+		player.life--;
+		e.isUsed = false;
+	}
 }
 
 //Keyboard event handler (sync input)

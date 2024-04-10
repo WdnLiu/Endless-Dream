@@ -106,6 +106,8 @@ set( Framework
     src/sprite.h
     src/sprite.cpp
     src/camera.h
+    src/entity.h
+    src/entity.cpp
 )
 source_group( "framework" FILES ${Framework} )
 set( ALL_FILES ${ALL_FILES} ${Framework} )

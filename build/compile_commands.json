@@ -1,0 +1,74 @@
+[
+{
+  "directory": "/home/wdn/Documents/TJE2D/build",
+  "command": "/usr/bin/g++ -I/home/wdn/Documents/TJE2D/src -I/usr/include/SDL2 -g -std=gnu++11 -o CMakeFiles/TJE.dir/src/main.cpp.o -c /home/wdn/Documents/TJE2D/src/main.cpp",
+  "file": "/home/wdn/Documents/TJE2D/src/main.cpp",
+  "output": "CMakeFiles/TJE.dir/src/main.cpp.o"
+},
+{
+  "directory": "/home/wdn/Documents/TJE2D/build",
+  "command": "/usr/bin/g++ -I/home/wdn/Documents/TJE2D/src -I/usr/include/SDL2 -g -std=gnu++11 -o CMakeFiles/TJE.dir/src/game.cpp.o -c /home/wdn/Documents/TJE2D/src/game.cpp",
+  "file": "/home/wdn/Documents/TJE2D/src/game.cpp",
+  "output": "CMakeFiles/TJE.dir/src/game.cpp.o"
+},
+{
+  "directory": "/home/wdn/Documents/TJE2D/build",
+  "command": "/usr/bin/g++ -I/home/wdn/Documents/TJE2D/src -I/usr/include/SDL2 -g -std=gnu++11 -o CMakeFiles/TJE.dir/src/math.cpp.o -c /home/wdn/Documents/TJE2D/src/math.cpp",
+  "file": "/home/wdn/Documents/TJE2D/src/math.cpp",
+  "output": "CMakeFiles/TJE.dir/src/math.cpp.o"
+},
+{
+  "directory": "/home/wdn/Documents/TJE2D/build",
+  "command": "/usr/bin/g++ -I/home/wdn/Documents/TJE2D/src -I/usr/include/SDL2 -g -std=gnu++11 -o CMakeFiles/TJE.dir/src/utils.cpp.o -c /home/wdn/Documents/TJE2D/src/utils.cpp",
+  "file": "/home/wdn/Documents/TJE2D/src/utils.cpp",
+  "output": "CMakeFiles/TJE.dir/src/utils.cpp.o"
+},
+{
+  "directory": "/home/wdn/Documents/TJE2D/build",
+  "command": "/usr/bin/g++ -I/home/wdn/Documents/TJE2D/src -I/usr/include/SDL2 -g -std=gnu++11 -o CMakeFiles/TJE.dir/src/image.cpp.o -c /home/wdn/Documents/TJE2D/src/image.cpp",
+  "file": "/home/wdn/Documents/TJE2D/src/image.cpp",
+  "output": "CMakeFiles/TJE.dir/src/image.cpp.o"
+},
+{
+  "directory": "/home/wdn/Documents/TJE2D/build",
+  "command": "/usr/bin/g++ -I/home/wdn/Documents/TJE2D/src -I/usr/include/SDL2 -g -std=gnu++11 -o CMakeFiles/TJE.dir/src/input.cpp.o -c /home/wdn/Documents/TJE2D/src/input.cpp",
+  "file": "/home/wdn/Documents/TJE2D/src/input.cpp",
+  "output": "CMakeFiles/TJE.dir/src/input.cpp.o"
+},
+{
+  "directory": "/home/wdn/Documents/TJE2D/build",
+  "command": "/usr/bin/g++ -I/home/wdn/Documents/TJE2D/src -I/usr/include/SDL2 -g -std=gnu++11 -o CMakeFiles/TJE.dir/src/synth.cpp.o -c /home/wdn/Documents/TJE2D/src/synth.cpp",
+  "file": "/home/wdn/Documents/TJE2D/src/synth.cpp",
+  "output": "CMakeFiles/TJE.dir/src/synth.cpp.o"
+},
+{
+  "directory": "/home/wdn/Documents/TJE2D/build",
+  "command": "/usr/bin/g++ -I/home/wdn/Documents/TJE2D/src -I/usr/include/SDL2 -g -std=gnu++11 -o CMakeFiles/TJE.dir/src/gameMap.cpp.o -c /home/wdn/Documents/TJE2D/src/gameMap.cpp",
+  "file": "/home/wdn/Documents/TJE2D/src/gameMap.cpp",
+  "output": "CMakeFiles/TJE.dir/src/gameMap.cpp.o"
+},
+{
+  "directory": "/home/wdn/Documents/TJE2D/build",
+  "command": "/usr/bin/g++ -I/home/wdn/Documents/TJE2D/src -I/usr/include/SDL2 -g -std=gnu++11 -o CMakeFiles/TJE.dir/src/player.cpp.o -c /home/wdn/Documents/TJE2D/src/player.cpp",
+  "file": "/home/wdn/Documents/TJE2D/src/player.cpp",
+  "output": "CMakeFiles/TJE.dir/src/player.cpp.o"
+},
+{
+  "directory": "/home/wdn/Documents/TJE2D/build",
+  "command": "/usr/bin/g++ -I/home/wdn/Documents/TJE2D/src -I/usr/include/SDL2 -g -std=gnu++11 -o CMakeFiles/TJE.dir/src/sprite.cpp.o -c /home/wdn/Documents/TJE2D/src/sprite.cpp",
+  "file": "/home/wdn/Documents/TJE2D/src/sprite.cpp",
+  "output": "CMakeFiles/TJE.dir/src/sprite.cpp.o"
+},
+{
+  "directory": "/home/wdn/Documents/TJE2D/build",
+  "command": "/usr/bin/g++ -I/home/wdn/Documents/TJE2D/src -I/usr/include/SDL2 -g -std=gnu++11 -o CMakeFiles/TJE.dir/src/entity.cpp.o -c /home/wdn/Documents/TJE2D/src/entity.cpp",
+  "file": "/home/wdn/Documents/TJE2D/src/entity.cpp",
+  "output": "CMakeFiles/TJE.dir/src/entity.cpp.o"
+},
+{
+  "directory": "/home/wdn/Documents/TJE2D/build",
+  "command": "/usr/bin/g++ -I/home/wdn/Documents/TJE2D/src -I/usr/include/SDL2 -g -std=gnu++11 -o CMakeFiles/TJE.dir/src/stage.cpp.o -c /home/wdn/Documents/TJE2D/src/stage.cpp",
+  "file": "/home/wdn/Documents/TJE2D/src/stage.cpp",
+  "output": "CMakeFiles/TJE.dir/src/stage.cpp.o"
+}
+]

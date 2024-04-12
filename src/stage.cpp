@@ -211,10 +211,6 @@ void PlayingStage::render(Image& framebuffer, const Image& minifont)
 {
 
     map->drawMap(framebuffer, *tileset, player->position, *camera);
-
-	framebuffer.drawText( "Kill count: " + toString(player->killCount), 1, 20, minifont, 4, 6 );
-	framebuffer.drawText( "Times snoozed: " + toString(player->killCount/10), 1, 30, minifont, 4, 6);
-	framebuffer.drawText( "Time survived: " + toString(Game::instance->time - startTime), 1, 40, minifont, 4, 6 );
 	
 	if (player->revive)
 	{
@@ -240,6 +236,10 @@ void PlayingStage::render(Image& framebuffer, const Image& minifont)
 	drawBullets( framebuffer);
 	drawEnemies( framebuffer);
 	drawPBullets(framebuffer);
+
+	framebuffer.drawText( "Kill count: " + toString(player->killCount), 1, 20, minifont, 4, 6 );
+	framebuffer.drawText( "Times snoozed: " + toString(player->killCount/10), 1, 30, minifont, 4, 6);
+	framebuffer.drawText( "Time survived: " + toString(Game::instance->time - startTime), 1, 40, minifont, 4, 6 );
 }
 
 Enemy* PlayingStage::findClosestEnemy()
@@ -385,8 +385,8 @@ void PlayingStage::update(float seconds_elapsed)
 	}
 
 	if (!player->targetable) player->targetable = (Game::instance->time - player->startRoll > 1);
-	if (player->rollCD) player->rollCD = (int(Game::instance->time - player->startRoll) > 5) ? false : true;
-	if (player->fireCD) player->fireCD = (Game::instance->time - player->startFire < 1);
+	if (player->rollCD) player->rollCD = (int(Game::instance->time - player->startRoll) > 1) ? false : true;
+	if (player->fireCD) player->fireCD = (Game::instance->time - player->startFire < 0.5);
 	if (player->isHit) {
 		bool tmp = (Game::instance->time - player->startHit < 2);
 		player->isHit = tmp;
@@ -396,6 +396,8 @@ void PlayingStage::update(float seconds_elapsed)
 		currentTick = Game::instance->time;
 		generateEnemies();
 	}
+
+	player->speed = (player->rolling) ? 120.0f : 60.0f;
 }
 
 void PlayingStage::generateEnemies()

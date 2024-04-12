@@ -21,6 +21,7 @@ Player::Player(Vector2 size, int speed)
     targetable = true;
     rolling = false;
     dead = false;
+    revive = false;
 
     position = Vector2(100.0f, 100.0f);
     this->speed = speed;
@@ -86,7 +87,7 @@ void Player::animate(Image& framebuffer, int spriteNum, const Camera& camera, in
 
 bool Player::compare(Vector2 a, Vector2 b)
 {
-    return (a.x > b.x && a.x < b.x+size.x-1 && a.y > b.y && a.y < b.y+size.y-1);
+    return (a.x-6 > b.x && a.x < b.x+size.x+6 && a.y-4 > b.y && a.y-8 < b.y+size.y);
 }
 
 bool Player::inHitbox(Bullet* b)

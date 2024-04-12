@@ -12,7 +12,7 @@ std::vector<Sprite*> Enemy::sprites;
 Bullet::Bullet(const Player& p, Vector2 pos)
 {
     this->position = pos;
-    this->speed = 80.0f;
+    this->speed = 90.f + PlayingStage::instance->startTime*0.25;
 
     direction = p.position - position;
     direction.normalize();
@@ -43,7 +43,7 @@ void Bullet::updatePos(float seconds_elapsed)
 PBullet::PBullet(const Enemy& e, Vector2 pos)
 {
     this->position = pos;
-    this->speed = 80.0f;
+    this->speed = 150.0f;
 
     direction = e.position - position;
     direction.normalize();
@@ -64,7 +64,7 @@ Enemy::Enemy(const Player& p)
 
     position = p.position + Vector2((rand()%30+50)*num1, (rand()%30+50)*num2);
     isUsed = (position.x > 0 && position.x < 450) && (position.y > 0 && position.y < 300);
-    life = 1 + int(Game::instance->time)/60;
+    life = 1;
     speed = 30.0f + 5*int(Game::instance->time)/60;
     startFire = 0;
 }

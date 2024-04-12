@@ -1,0 +1,3 @@
+/home/wdn/Documents/TJE2D/build/CMakeFiles/TJE.dir
+/home/wdn/Documents/TJE2D/build/CMakeFiles/edit_cache.dir
+/home/wdn/Documents/TJE2D/build/CMakeFiles/rebuild_cache.dir

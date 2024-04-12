@@ -56,6 +56,7 @@ void IntroStage::update(float seconds_elapsed)
 void IntroStage::switchStage()
 {
 	currentStage = PlayingStage::instance;
+	PlayingStage::instance->startTime = Game::instance->time;
 }
 
 PlayingStage::PlayingStage()
@@ -140,8 +141,8 @@ PBullet* PlayingStage::findFreePBullet()
 		return b;
 	}
 
-	std::cout << "No more bullets" << std::endl;
-	return pBullets[0];
+	std::cout << "No free bullets" << std::endl;
+	return nullptr;
 }
 
 Bullet* PlayingStage::findFreeBullet()
@@ -155,8 +156,8 @@ Bullet* PlayingStage::findFreeBullet()
 		return b;
 	}
 
-	std::cout << "No more bullets" << std::endl;
-	return bullets[0];
+	std::cout << "No free player bullets" << std::endl;
+	return nullptr;
 }
 
 Enemy* PlayingStage::findFreeEnemy()
@@ -169,6 +170,8 @@ Enemy* PlayingStage::findFreeEnemy()
 		e->isUsed = true;
 		return e;
 	}
+	std::cout << "No free enemies" << std::endl;
+	return nullptr;
 }
 
 void PlayingStage::drawPBullets(Image& framebuffer)
@@ -241,7 +244,7 @@ Enemy* PlayingStage::findClosestEnemy()
 
 	for (Enemy* e : enemies)
 	{
-		if (!e->isUsed) continue;
+		if (!e->isUsed || e->dead) continue;
 		float distance = e->position.distance(player->position);
 		if (distance < min) {
 			min = distance;
@@ -300,8 +303,15 @@ void PlayingStage::update(float seconds_elapsed)
 		player->rollCD = true;
 		player->targetable = false;
 	}
-	if (Input::wasKeyPressed(SDL_SCANCODE_A)) {
-		*findFreeEnemy() = Enemy(*player);
+	if (Input::wasKeyPressed(SDL_SCANCODE_A))
+	{
+		Enemy* enemy = findFreeEnemy();
+		if (enemy) *enemy = Enemy(*player);
+	}
+	if (Input::wasKeyPressed(SDL_SCANCODE_K))
+	{
+		player->dead = true;
+		player->startDeath = Game::instance->time;
 	}
 
 	target = player->position+playerSpeed;
@@ -381,7 +391,8 @@ void PlayingStage::generateEnemies()
 {
 	for (int i = 0; i < (Game::instance->time - startTime)/5 + rand()%5; ++i)
 	{
-		*findFreeEnemy() = Enemy(*player);
+		Enemy* tmp = findFreeEnemy();
+		if (tmp) *tmp = Enemy(*player);
 	}
 }
 

@@ -16,7 +16,7 @@ class Enemy;
 class PBullet;
 
 enum eStages { INTRO_STAGE, PLAYING_STAGE, ENDING_STAGE };
-
+enum eEntity { eBULLET, eENEMY, ePBULLET };
 
 class Stage
 {
@@ -50,7 +50,6 @@ public:
     static PlayingStage* instance;
     Player* player;
 
-    std::vector<std::vector<Entity*>> entities;
     std::vector<PBullet*> pBullets;
     std::vector<Bullet* > bullets;
     std::vector<Enemy*  > enemies;

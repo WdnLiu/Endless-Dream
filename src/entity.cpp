@@ -89,9 +89,12 @@ void Enemy::updatePos(const Player& p, float seconds_elapsed)
 
     if (!fireCD)
     {
-        *PlayingStage::instance->findFreeBullet() = Bullet(p, this->position);
-        fireCD = true;
-        startFire = Game::instance->time;
+        Bullet* tmp = PlayingStage::instance->findFreeBullet();
+        if (tmp) {
+            *tmp = Bullet(p, this->position);
+            fireCD = true;
+            startFire = Game::instance->time;
+        }
     }
     fireCD = int(Game::instance->time-startFire) != 5;
 

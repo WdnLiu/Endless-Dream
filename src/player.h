@@ -16,6 +16,7 @@ class Player
 public:
     std::vector<std::vector<Sprite*>> sprites;
     Sprite* deathAnim;
+    Sprite* reviveAnim;
 
     Vector2 size;
     int life;
@@ -27,6 +28,7 @@ public:
     bool rolling;
     bool dead;
     bool isHit;
+    bool revive;
 
     Vector2 position;
     float speed;
@@ -37,17 +39,18 @@ public:
     float startRoll;
     float startDeath;
     float startHit;
+    float startRevive;
 
     Player(Vector2 size, int speed);
 
     void restart();
 
     void loadTGA(const char* filename, int width, int height, int num, sDir dir, sState state);
-    void loadDeathAnim(const char* filename, int width, int height,  int num);
 
     void animate(Image& framebuffer, const Camera& camera);
+    void animate(Image& framebuffer, int spriteNum, const Camera& camera, int mode);
     void animateRoll(Image& framebuffer, int spriteNum, const Camera& camera);
-    void animateDeath(Image& framebuffer, int spriteNum, const Camera& camera);
+    
 
     bool inHitbox(Bullet* b);
     bool compare(Vector2 a, Vector2 b);

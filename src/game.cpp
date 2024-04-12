@@ -6,26 +6,18 @@
 #include "player.h"
 #include "camera.h"
 #include "entity.h"
+#include "stage.h"
 #include <cmath>
 
 Game* Game::instance = NULL;
+IntroStage* IntroStage::instance = NULL;
+PlayingStage* PlayingStage::instance = NULL;
+EndingStage* EndingStage::instance = NULL;
 
 Image font;
 Image minifont;
-Image sprite;
-Image tileset;
-GameMap map;
 Color bgcolor(130, 80, 100);
-Vector2 target;
-Camera camera;
-Entity e = Entity();
-
-// Vector2 playerPosition = Vector2(50.0f, 50.0f);
-Player player = Player(Vector2(15, 20), 1, 60.0f);
-// Vector2 offsetCam = Vector2(0, 0);
-int spriteNum = 0;
-
-float startRoll = 0;
+Stage* currentStage;
 
 Game::Game(int window_width, int window_height, SDL_Window* window)
 {
@@ -40,32 +32,22 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	frame = 0;
 	time = 0.0f;
 	elapsed_time = 0.0f;
-	camera = Camera(player.position.x, player.position.y);
+	
+	currentStage = new IntroStage();
+
+	IntroStage::instance = new IntroStage();
+	PlayingStage::instance = new PlayingStage();
+	EndingStage::instance = new EndingStage();
+
+	Bullet::setSprite();
+	Enemy::setSprite();
 
 	font.loadTGA("../data/bitmap-font-white.tga"); //load bitmap-font image
 	minifont.loadTGA("../data/mini-font-white-4x6.tga"); //load bitmap-font image
 	// sprite.loadTGA("../data/idle.tga"); //example to load an sprite
-	map.loadGameMap("../data/testMap.tmj");
-	tileset.loadTGA("../data/Tiles.tga");
-
-	player.loadIdle(Player::DOWN_FACING, "../data/idleDown.tga", 15, 20, 4);
-	player.loadIdle(Player::UP_FACING, "../data/idleUp.tga", 15, 20, 4);
-	player.loadIdle(Player::RIGHT_FACING, "../data/idleRight.tga", 16, 20, 4);
-	player.loadIdle(Player::LEFT_FACING, "../data/idleLeft.tga", 16, 20, 4);
-
-	player.loadWalk(Player::RIGHT_FACING, "../data/walkRight.tga", 16, 21, 6);
-	player.loadWalk(Player::LEFT_FACING, "../data/walkLeft.tga", 16, 21, 6);
-	player.loadWalk(Player::DOWN_FACING, "../data/walkDown.tga", 16, 21, 6);
-	player.loadWalk(Player::UP_FACING, "../data/walkUp.tga", 16, 21, 6);
-
-	player.loadRoll(Player::DOWN_FACING, "../data/rollDown.tga", 17, 25, 9);
-	player.loadRoll(Player::UP_FACING, "../data/rollUp.tga", 17, 24, 9);
-	player.loadRoll(Player::RIGHT_FACING, "../data/rollRight.tga", 19, 22, 9);
-	player.loadRoll(Player::LEFT_FACING, "../data/rollLeft.tga", 19, 22, 9);
-
 
 	// enableAudio(); //enable this line if you plan to add audio to your application
-	// synth.playSample("../data/coin.wav",1,true);
+	// synth.playSample("../data/bgm.wav",1,true);
 	//synth.osc1.amplitude = 0.5;
 }
 
@@ -75,101 +57,17 @@ void Game::render(void)
 	//Create a new Image (or we could create a global one if we want to keep the previous frame)
 	Image framebuffer(160, 120); //do not change framebuffer size
 
-	//add your code here to fill the framebuffer
-	//...
-	// camera.position = player.position+Vector2(framebuffer.width/2.0f, framebuffer.height/2.0f);
-
-	map.drawMap(framebuffer, tileset, player.position, camera);
-
-	//some new useful functions
-	// framebuffer.fill( bgcolor );								//fills the image with one color
-	//framebuffer.drawLine( 0, 0, 100,100, Color::RED );		//draws a line
-	//framebuffer.drawImage( sprite, 0, 0 );					//draws full image
-	// framebuffer.drawImage( sprite, 0, 0, framebuffer.width, framebuffer.height );			//draws a scaled image
-	// framebuffer.drawText( "Hello World", 0, 0, font );				//draws some text using a bitmap font in an image (assuming every char is 7x9)
-	framebuffer.drawText( toString(camera.position.x) + ':' + toString(camera.position.y), 1, 10, minifont,4,6);	//draws some text using a bitmap font in an image (assuming every char is 4x6)
-	framebuffer.drawText( toString(player.position.x) + ':' + toString(player.position.y), 1, 17, minifont,4,6);	//draws some text using a bitmap font in an image (assuming every char is 4x6)
-	framebuffer.drawText( toString(player.life), 1, 25, minifont,4,6);	//draws some text using a bitmap font in an image (assuming every char is 4x6)
-
-	// framebuffer.drawImage( sprite, framebuffer.width/2.0 - offsetCam.x, framebuffer.height/2.0 - offsetCam.y, Area(spriteNum*15, direction*18, 15, 20) );	//draws only a part of an image
-	if (player.rolling) {
-		player.animateRoll(framebuffer, spriteNum, camera);
-		spriteNum = int ((time-startRoll)*20) %9;
-	} 
-	else player.animate(framebuffer, time, camera);
-
-	if (player.rollCD) player.rollCD = (int(time-startRoll) == 5) ? false : true;
-
-	if (e.isUsed) {
-		e.updatePos(Game::instance->elapsed_time);
-		e.drawEntity(framebuffer, camera);
-	}
-
 	//send image to screen
+	currentStage->render(framebuffer, minifont);
+
 	showFramebuffer(&framebuffer);
 }
 
 void Game::update(double seconds_elapsed)
 {
-	//Add here your update method
-	//...
-	Vector2 playerSpeed = Vector2(0.0f, 0.0f);
-	//Read the keyboard state, to see all the keycodes: https://wiki.libsdl.org/SDL_Keycode
-	if (Input::isKeyPressed(SDL_SCANCODE_UP)) //if key up
-	{
-		playerSpeed.y -= 1;
-		player.direction = Player::UP_FACING;
-	}
-	if (Input::isKeyPressed(SDL_SCANCODE_DOWN)) //if key down
-	{
-		playerSpeed.y += 1;
-		player.direction = Player::DOWN_FACING;
-	}
-	if (Input::isKeyPressed(SDL_SCANCODE_RIGHT))
-	{
-		playerSpeed.x += 1;
-		player.direction = Player::RIGHT_FACING;
-	}
-	if (Input::isKeyPressed(SDL_SCANCODE_LEFT))
-	{
-		playerSpeed.x -= 1;
-		player.direction = Player::LEFT_FACING;
-	}
-	if (Input::wasKeyPressed(SDL_SCANCODE_Z) && !player.rollCD)
-	{
-		player.rolling = true;
-		startRoll = time;
-		spriteNum = 0;
-		player.rollCD = true;
-	}
-	if (Input::wasKeyPressed(SDL_SCANCODE_A)) {
-		e = Entity(player);
-	}
+	currentStage->update(seconds_elapsed);
 
-	target = player.position+playerSpeed;
-
-	if (playerSpeed.x != 0 && playerSpeed.y != 0) {
-		playerSpeed.normalize();
-	}
-	if (playerSpeed.x != 0 || playerSpeed.y != 0) {
-		player.moving = true;
-	}
-	else player.moving = false;
-
-	// camera.offset.x = clamp(camera.offset.x + playerSpeed.x*30*seconds_elapsed, -20, 20);
-	// camera.offset.y = clamp(camera.offset.y + playerSpeed.y*30*seconds_elapsed, -20, 20);
-
-	if (player.moving) {
-		player.position.x = clamp(player.position.x + playerSpeed.x*player.speed*seconds_elapsed, 15, 450);
-		player.position.y = clamp(player.position.y + playerSpeed.y*player.speed*seconds_elapsed, 0, 285);
-	}
-	camera.position.x = clamp(player.position.x, 15, 500);
-	camera.position.y = clamp(player.position.y, 0, 335);
-
-	if (player.inHitbox(e.position) && e.isUsed) {
-		player.life--;
-		e.isUsed = false;
-	}
+	currentStage = currentStage->currentStage;	
 }
 
 //Keyboard event handler (sync input)

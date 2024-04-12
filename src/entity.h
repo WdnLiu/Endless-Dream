@@ -1,7 +1,12 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include "player.h"
+#include <vector>
+#include "image.h"
+
+class Player;
+class Camera;
+class Sprite;
 
 class Entity
 {
@@ -9,42 +14,51 @@ public:
     Vector2 position;
     Vector2 direction;
     float speed;
+
+    Entity() {}
+
+    virtual void drawEntity(Image& framebuffer, const Camera& camera) {}
+
+};
+
+class Bullet : public Entity
+{
+public:
+    static Sprite* sprite;
     int damage;
     bool isUsed;
 
-    Entity() { isUsed = false; }
+    Bullet() : Entity() { isUsed = false; }
 
-    Entity(const Player& p)
-    {
-        this->position = p.position + Vector2(rand()%30+50, rand()%30+50);
-        this->speed = rand()%100;
-        this->damage = 1;
+    Bullet(const Player& p, Vector2 pos);
 
-        direction = p.position - position;
-        direction.normalize();
-        isUsed = true;
-    }
+    void updatePos(float seconds_elapsed);
 
-    Entity(const Player& p, Vector2 position, float speed, int damage)
-    {
-        this->position = position;
-        this->speed = speed;
-        this->damage = damage;
-
-        direction = p.position - position;
-        direction.normalize();
-        isUsed = true;
-    }
-
-    void updatePos(float time_elapsed) 
-    { 
-        this->position += direction*speed*time_elapsed; 
-
-        if (position.x < 0 || position.x > 450 || position.y < 0 || position.y > 300) isUsed = false;
-    }
+    static void setSprite();
 
     void drawEntity(Image& framebuffer, const Camera& camera);
 
+};
+
+class Enemy : public Entity
+{
+public:
+    static std::vector<Sprite*> sprites;
+    
+    bool isUsed;
+    bool fireCD;
+    bool moving;
+    float startFire;
+    int life;
+    
+    Enemy() : Entity() { isUsed = false; }
+    Enemy(const Player& p);
+
+    static void setSprite();
+
+    void updatePos(const Player& p, float seconds_elapsed);
+
+    void drawEntity(Image& framebuffer, const Camera& camera);
 };
 
 #endif //ENTITY_H

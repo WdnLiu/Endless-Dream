@@ -68,8 +68,8 @@ void GameMap::drawMap(Image& framebuffer, const Image& tileset, const Vector2& p
         Area area(tilex, tiley, cs, cs);
 
         //Place offset here if you want
-        int screenx = x * cs - camera.position.x + framebuffer.width/2.0f;
-        int screeny = y * cs - camera.position.y + framebuffer.height/2.0f;
+        int screenx = x * cs - camera.position.x + camera.half.x;
+        int screeny = y * cs - camera.position.y + camera.half.y;
 
         //Avoid rendering out of screen stuff
         if (screenx < -cs || screenx > (int) framebuffer.width ||

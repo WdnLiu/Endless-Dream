@@ -108,6 +108,8 @@ set( Framework
     src/camera.h
     src/entity.h
     src/entity.cpp
+    src/stage.h
+    src/stage.cpp
 )
 source_group( "framework" FILES ${Framework} )
 set( ALL_FILES ${ALL_FILES} ${Framework} )

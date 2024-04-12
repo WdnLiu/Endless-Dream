@@ -36,10 +36,9 @@ void IntroStage::render(Image& framebuffer, const Image& minifont)
 
 		framebuffer.drawText("Controls:", 1, framebuffer.height - 50, minifont, 4, 6);
 		framebuffer.drawText("Use your arrow keys to move", 1, framebuffer.height - 40, minifont, 4, 6);
-		framebuffer.drawText("Press x to roll and dodge enemy bullets!", 1, framebuffer.height - 30, minifont, 4, 6);
-		framebuffer.drawText("Press z to cast a fireball towards", 1, framebuffer.height - 20, minifont, 4, 6);
-		framebuffer.drawText("closest enemy! (WIP)", 1, framebuffer.height - 10, minifont, 4, 6);
-
+		framebuffer.drawText("Press z to roll and dodge enemy bullets!", 1, framebuffer.height - 30, minifont, 4, 6);
+		framebuffer.drawText("Press x to cast a fireball towards", 1, framebuffer.height - 20, minifont, 4, 6);
+		framebuffer.drawText("closest enemy!", 1, framebuffer.height - 10, minifont, 4, 6);
 	}
 }
 
@@ -238,8 +237,6 @@ void PlayingStage::render(Image& framebuffer, const Image& minifont)
 		else player->animate(framebuffer, *camera);
 	}
 
-	if (player->rollCD) player->rollCD = (int(Game::instance->time - player->startRoll) > 5) ? false : true;
-
 	drawBullets( framebuffer);
 	drawEnemies( framebuffer);
 	drawPBullets(framebuffer);
@@ -305,7 +302,7 @@ void PlayingStage::update(float seconds_elapsed)
 			player->startFire = Game::instance->time;
 			*findFreePBullet() = PBullet(*tmp, player->position);
 		}
-		else printf("No closest enemy");
+		else printf("No closest enemy\n");
 
 	}
 	if (Input::wasKeyPressed(SDL_SCANCODE_Z) && !player->rollCD)
@@ -388,6 +385,7 @@ void PlayingStage::update(float seconds_elapsed)
 	}
 
 	if (!player->targetable) player->targetable = (Game::instance->time - player->startRoll > 1);
+	if (player->rollCD) player->rollCD = (int(Game::instance->time - player->startRoll) > 5) ? false : true;
 	if (player->fireCD) player->fireCD = (Game::instance->time - player->startFire < 1);
 	if (player->isHit) {
 		bool tmp = (Game::instance->time - player->startHit < 2);

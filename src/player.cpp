@@ -15,6 +15,7 @@ Player::Player(Vector2 size, int speed)
     this->size = size;
     this->life = START_LIFE;
     direction = DOWN_FACING;
+    killCount = 0;
 
     moving = false;
     targetable = true;
@@ -34,10 +35,13 @@ void Player::restart()
     targetable = true;
     rolling = false;
     dead = false;
+    isHit = false;
 
     position = Vector2(100.0f, 100.0f);
     rollCD = 0;
+
     life = START_LIFE;
+    killCount = 0;
 }
 
 void Player::loadTGA(const char* filename, int width, int height, int num, sDir dir, sState state) 

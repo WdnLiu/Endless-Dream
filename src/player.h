@@ -20,16 +20,23 @@ public:
     Vector2 size;
     int life;
     int direction;
+    int killCount;
 
     bool moving;
     bool targetable;
     bool rolling;
     bool dead;
+    bool isHit;
 
     Vector2 position;
     float speed;
     bool rollCD;
+    bool fireCD;
+
+    float startFire;
     float startRoll;
+    float startDeath;
+    float startHit;
 
     Player(Vector2 size, int speed);
 

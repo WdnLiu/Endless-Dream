@@ -7,6 +7,7 @@
 class Player;
 class Camera;
 class Sprite;
+class PBullet;
 
 class Entity
 {
@@ -18,7 +19,6 @@ public:
     Entity() {}
 
     virtual void drawEntity(Image& framebuffer, const Camera& camera) {}
-
 };
 
 class Bullet : public Entity
@@ -28,7 +28,7 @@ public:
     int damage;
     bool isUsed;
 
-    Bullet() : Entity() { isUsed = false; }
+    Bullet() { isUsed = false; }
 
     Bullet(const Player& p, Vector2 pos);
 
@@ -37,7 +37,6 @@ public:
     static void setSprite();
 
     void drawEntity(Image& framebuffer, const Camera& camera);
-
 };
 
 class Enemy : public Entity
@@ -48,10 +47,13 @@ public:
     bool isUsed;
     bool fireCD;
     bool moving;
+    bool dead;
+    
     float startFire;
+    float startDeath;
     int life;
     
-    Enemy() : Entity() { isUsed = false; }
+    Enemy() { isUsed = false; }
     Enemy(const Player& p);
 
     static void setSprite();
@@ -59,6 +61,22 @@ public:
     void updatePos(const Player& p, float seconds_elapsed);
 
     void drawEntity(Image& framebuffer, const Camera& camera);
+
+    bool inHitbox(PBullet* b);
+    bool compare(Vector2 a, Vector2 b);
+};
+
+class PBullet : public Bullet
+{
+public:
+    static Sprite* sprite;
+
+    PBullet() { isUsed = false; }
+    PBullet(const Enemy& e, Vector2 pos); 
+
+    void drawEntity(Image& framebuffer, const Camera& camera);
+
+    static void setSprite();
 };
 
 #endif //ENTITY_H

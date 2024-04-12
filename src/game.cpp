@@ -41,10 +41,10 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 
 	Bullet::setSprite();
 	Enemy::setSprite();
+	PBullet::setSprite();
 
 	font.loadTGA("../data/bitmap-font-white.tga"); //load bitmap-font image
 	minifont.loadTGA("../data/mini-font-white-4x6.tga"); //load bitmap-font image
-	// sprite.loadTGA("../data/idle.tga"); //example to load an sprite
 
 	// enableAudio(); //enable this line if you plan to add audio to your application
 	// synth.playSample("../data/bgm.wav",1,true);

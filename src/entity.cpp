@@ -6,6 +6,7 @@
 #include "stage.h"
 
 Sprite* Bullet::sprite = nullptr;
+Sprite* PBullet::sprite = nullptr;
 std::vector<Sprite*> Enemy::sprites;
 
 Bullet::Bullet(const Player& p, Vector2 pos)
@@ -39,6 +40,22 @@ void Bullet::updatePos(float seconds_elapsed)
     if (position.x < 0 || position.x > 450 || position.y < 0 || position.y > 300) isUsed = false;
 }
 
+PBullet::PBullet(const Enemy& e, Vector2 pos)
+{
+    this->position = pos;
+    this->speed = 80.0f;
+
+    direction = e.position - position;
+    direction.normalize();
+    isUsed = true;
+    damage = 1;
+}
+
+void PBullet::setSprite()
+{
+    sprite = new Sprite("../data/playerBullet.tga", 11, 9, 4);
+}
+
 Enemy::Enemy(const Player& p)
 {
     int directions[] = {-1, 1};
@@ -54,14 +71,16 @@ Enemy::Enemy(const Player& p)
 
 void Enemy::setSprite()
 {
-    sprites = std::vector<Sprite*>(2);
+    sprites = std::vector<Sprite*>(3);
 
     sprites[0] = new Sprite("../data/leftEnemy.tga" , 22, 25, 4);
     sprites[1] = new Sprite("../data/rightEnemy.tga", 22, 25, 4);
+    sprites[2] = new Sprite("../data/enemyDeath1.tga", 22, 21, 5);
 }
 
 void Enemy::updatePos(const Player& p, float seconds_elapsed)
 {
+    if (life == 0) return;
     float distance = this->position.distance(p.position);
     moving = (distance >= 30);
 
@@ -80,7 +99,29 @@ void Enemy::updatePos(const Player& p, float seconds_elapsed)
 }
 
 void Enemy::drawEntity(Image& framebuffer, const Camera& camera){
-    Sprite* sprite = sprites[direction.x > 0];
+    Sprite* sprite = (dead) ? sprites[2] : sprites[direction.x > 0];
+    Image img = sprite->sprite;
+    int num = sprite->num;
+    int spriteNum = (dead) ? (int(Game::instance->time-startDeath)*7)%num : int(Game::instance->time*7)%num;
+    framebuffer.drawImage( img, position.x - camera.position.x + camera.half.x, position.y - camera.position.y + camera.half.y, Area(spriteNum*sprite->width, 0, sprite->width, sprite->height) );
+
+    isUsed = !((spriteNum == num-1) && dead);
+}
+
+bool Enemy::compare(Vector2 a, Vector2 b)
+{
+    return (a.x > b.x && a.x < b.x+sprites[0]->width-1 && a.y > b.y && a.y < b.y+sprites[0]->height-1);
+}
+
+bool Enemy::inHitbox(PBullet* b)
+{
+    Vector2 point = b->position;
+    Vector2 bSize  = Vector2(b->sprite->height, b->sprite->height);
+    return compare(point, position) || compare(point+bSize, position);
+}
+
+void PBullet::drawEntity(Image& framebuffer, const Camera& camera)
+{
     Image img = sprite->sprite;
     int num = sprite->num;
     int spriteNum = int(Game::instance->time*7)%num;

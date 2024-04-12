@@ -13,6 +13,7 @@ class Camera;
 class GameMap;
 class Bullet;
 class Enemy;
+class PBullet;
 
 enum eStages { INTRO_STAGE, PLAYING_STAGE, ENDING_STAGE };
 
@@ -48,12 +49,14 @@ class PlayingStage : public Stage
 public:
     static PlayingStage* instance;
     Player* player;
-    std::vector<Bullet*> bullets;
-    std::vector<Enemy* > enemies;
+
+    std::vector<std::vector<Entity*>> entities;
+    std::vector<PBullet*> pBullets;
+    std::vector<Bullet* > bullets;
+    std::vector<Enemy*  > enemies;
 
     float startTime;
-    float startRoll;
-    float startDeath;
+    float currentTick;
     int   spriteNum;
     
     Vector2  target;
@@ -68,11 +71,16 @@ public:
 
     void switchStage();
 
-    Bullet* findFreeBullet();
-    Enemy*   findFreeEnemy();
+    void generateEnemies();
 
-    void drawBullets(Image& framebuffer);
-    void drawEnemies(Image& framebuffer);
+    PBullet* findFreePBullet();
+    Bullet*  findFreeBullet();
+    Enemy*   findFreeEnemy();
+    Enemy*   findClosestEnemy();
+
+    void drawBullets( Image& framebuffer);
+    void drawEnemies( Image& framebuffer);
+    void drawPBullets(Image& framebuffer);
 };
 
 class EndingStage : public Stage
@@ -80,6 +88,7 @@ class EndingStage : public Stage
 public:
     static EndingStage* instance;
     float finalTime;
+    int score;
     Image* endScene;
 
     EndingStage();

@@ -36,10 +36,9 @@ void IntroStage::render(Image& framebuffer, const Image& minifont)
 
 		framebuffer.drawText("Controls:", 1, framebuffer.height - 50, minifont, 4, 6);
 		framebuffer.drawText("Use your arrow keys to move", 1, framebuffer.height - 40, minifont, 4, 6);
-		framebuffer.drawText("Press x to roll and dodge enemy bullets!", 1, framebuffer.height - 30, minifont, 4, 6);
-		framebuffer.drawText("Press z to cast a fireball towards", 1, framebuffer.height - 20, minifont, 4, 6);
-		framebuffer.drawText("closest enemy! (WIP)", 1, framebuffer.height - 10, minifont, 4, 6);
-
+		framebuffer.drawText("Press z to roll and dodge enemy bullets!", 1, framebuffer.height - 30, minifont, 4, 6);
+		framebuffer.drawText("Press x to cast a fireball towards", 1, framebuffer.height - 20, minifont, 4, 6);
+		framebuffer.drawText("closest enemy!", 1, framebuffer.height - 10, minifont, 4, 6);
 	}
 }
 
@@ -92,7 +91,8 @@ PlayingStage::PlayingStage()
 	player->loadTGA("../data/rollRight.tga", 19, 22, 9, RIGHT_FACING, ROLLING);
 	player->loadTGA("../data/rollLeft.tga" , 19, 22, 9, LEFT_FACING,  ROLLING);
 
-	player->loadDeathAnim("../data/deathAnimation.tga", 19, 25, 12);
+	player->deathAnim = new Sprite("../data/deathAnimation.tga", 19, 25, 12);
+	player->reviveAnim = new Sprite("../data/reviveAnimation.tga", 25, 32, 14);
 
 	currentStage = this;
 
@@ -216,21 +216,26 @@ void PlayingStage::render(Image& framebuffer, const Image& minifont)
 	framebuffer.drawText( "Times snoozed: " + toString(player->killCount/10), 1, 30, minifont, 4, 6);
 	framebuffer.drawText( "Time survived: " + toString(Game::instance->time - startTime), 1, 40, minifont, 4, 6 );
 	
-	if (!player->isHit || (player->isHit && int(Game::instance->time*10)%2)){
+	if (player->revive)
+	{
+		player->animate(framebuffer, spriteNum, *camera, 1);
+		spriteNum = int((Game::instance->time - player->startRevive)*10)%player->reviveAnim->num;
+		return;
+	}
+	else if (player->dead)
+	{
+		player->animate(framebuffer, spriteNum, *camera, 0);
+		spriteNum = int((Game::instance->time - player->startDeath)*10)%player->deathAnim->num;
+		return;
+	}
+	else if (!player->isHit || (player->isHit && int(Game::instance->time*10)%2)){
 		if (player->rolling)
 		{
 			player->animateRoll(framebuffer, spriteNum, *camera);
 			spriteNum = int ((Game::instance->time - player->startRoll)*20) %9;
 		}
-		else if (player->dead)
-		{
-			player->animateDeath(framebuffer, spriteNum, *camera);
-			spriteNum = int((Game::instance->time - player->startDeath)*10)%player->deathAnim->num;
-			return;
-		}
 		else player->animate(framebuffer, *camera);
 	}
-	if (player->rollCD) player->rollCD = (int(Game::instance->time - player->startRoll) > 5) ? false : true;
 
 	drawBullets( framebuffer);
 	drawEnemies( framebuffer);
@@ -261,6 +266,11 @@ void PlayingStage::update(float seconds_elapsed)
 		if (spriteNum == player->deathAnim->num-1) switchStage();
 		return;	
 	}
+	if (player->revive) {
+		player->revive = !(spriteNum == player->reviveAnim->num-1);
+		return;
+	}
+
     Vector2 playerSpeed = Vector2(0.0f, 0.0f);
 	//Read the keyboard state, to see all the keycodes: https://wiki.libsdl.org/SDL_Keycode
 	if (Input::isKeyPressed(SDL_SCANCODE_UP)) //if key up
@@ -292,7 +302,7 @@ void PlayingStage::update(float seconds_elapsed)
 			player->startFire = Game::instance->time;
 			*findFreePBullet() = PBullet(*tmp, player->position);
 		}
-		else printf("No closest enemy");
+		else printf("No closest enemy\n");
 
 	}
 	if (Input::wasKeyPressed(SDL_SCANCODE_Z) && !player->rollCD)
@@ -375,6 +385,7 @@ void PlayingStage::update(float seconds_elapsed)
 	}
 
 	if (!player->targetable) player->targetable = (Game::instance->time - player->startRoll > 1);
+	if (player->rollCD) player->rollCD = (int(Game::instance->time - player->startRoll) > 5) ? false : true;
 	if (player->fireCD) player->fireCD = (Game::instance->time - player->startFire < 1);
 	if (player->isHit) {
 		bool tmp = (Game::instance->time - player->startHit < 2);

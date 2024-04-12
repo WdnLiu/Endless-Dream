@@ -36,9 +36,12 @@ void Player::restart()
     rolling = false;
     dead = false;
     isHit = false;
+    revive = true;
 
     position = Vector2(100.0f, 100.0f);
     rollCD = 0;
+
+    startRevive = Game::instance->time;
 
     life = START_LIFE;
     killCount = 0;
@@ -47,11 +50,6 @@ void Player::restart()
 void Player::loadTGA(const char* filename, int width, int height, int num, sDir dir, sState state) 
 {
     sprites[state][dir] = new Sprite(filename, width, height, num); 
-}
-
-void Player::loadDeathAnim(const char* filename, int width, int height,  int num)
-{
-    deathAnim = new Sprite(filename, width, height, num);
 }
 
 void Player::animate(Image& framebuffer, const Camera& camera)
@@ -74,11 +72,16 @@ void Player::animateRoll(Image& framebuffer, int spriteNum, const Camera& camera
     rolling = (spriteNum == sprite.num-1) ? false : true;
 }
 
-void Player::animateDeath(Image& framebuffer, int spriteNum, const Camera& camera)
+void Player::animate(Image& framebuffer, int spriteNum, const Camera& camera, int mode)
 {
-    Image img = deathAnim->sprite;
-
-    framebuffer.drawImage( img, camera.half.x, camera.half.y, Area(spriteNum*deathAnim->width, 0, deathAnim->width, deathAnim->height));
+    Sprite* sprite;
+    if (mode == 0){
+        sprite = deathAnim;
+    }
+    else{
+        sprite = reviveAnim;
+    }
+    framebuffer.drawImage( sprite->sprite, camera.half.x, camera.half.y, Area(spriteNum*sprite->width, 0, sprite->width, sprite->height));    
 }
 
 bool Player::compare(Vector2 a, Vector2 b)

@@ -22,6 +22,7 @@ Player::Player(Vector2 size, int speed)
     rolling = false;
     dead = false;
     revive = false;
+    isHit = false;
 
     position = Vector2(100.0f, 100.0f);
     this->speed = speed;

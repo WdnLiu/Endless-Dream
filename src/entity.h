@@ -61,6 +61,7 @@ public:
     void updatePos(const Player& p, float seconds_elapsed);
 
     void drawEntity(Image& framebuffer, const Camera& camera);
+    void drawDeath(Image& framebuffer, int spriteNum, const Camera& camera);
 
     bool inHitbox(PBullet* b);
     bool compare(Vector2 a, Vector2 b);
@@ -75,6 +76,7 @@ public:
     PBullet(const Enemy& e, Vector2 pos); 
 
     void drawEntity(Image& framebuffer, const Camera& camera);
+    static void drawEntity(Image& framebuffer, Vector2 v);
 
     static void setSprite();
 };

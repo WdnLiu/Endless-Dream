@@ -12,7 +12,7 @@ std::vector<Sprite*> Enemy::sprites;
 Bullet::Bullet(const Player& p, Vector2 pos)
 {
     this->position = pos;
-    this->speed = 90.f + PlayingStage::instance->startTime*0.25;
+    this->speed = 60.f - PlayingStage::instance->startTime+Game::instance->time;
 
     direction = p.position - position;
     direction.normalize();
@@ -62,7 +62,7 @@ Enemy::Enemy(const Player& p)
     int num1 = directions[rand()%2];
     int num2 = directions[rand()%2];
 
-    position = p.position + Vector2((rand()%30+50)*num1, (rand()%30+50)*num2);
+    position = p.position + Vector2((rand()%30+75)*num1, (rand()%30+75)*num2);
     isUsed = (position.x > 0 && position.x < 450) && (position.y > 0 && position.y < 300);
     life = 1;
     speed = 30.0f + 5*int(Game::instance->time)/60;
@@ -75,12 +75,12 @@ void Enemy::setSprite()
 
     sprites[0] = new Sprite("../data/leftEnemy.tga" , 22, 25, 4);
     sprites[1] = new Sprite("../data/rightEnemy.tga", 22, 25, 4);
-    sprites[2] = new Sprite("../data/enemyDeath1.tga", 22, 21, 5);
+    sprites[2] = new Sprite("../data/enemyDeath1.tga", 22, 21, 12);
 }
 
 void Enemy::updatePos(const Player& p, float seconds_elapsed)
 {
-    if (life == 0) return;
+    if (dead) return;
     float distance = this->position.distance(p.position);
     moving = (distance >= 30);
 
@@ -102,13 +102,21 @@ void Enemy::updatePos(const Player& p, float seconds_elapsed)
 }
 
 void Enemy::drawEntity(Image& framebuffer, const Camera& camera){
-    Sprite* sprite = (dead) ? sprites[2] : sprites[direction.x > 0];
+    Sprite* sprite = sprites[direction.x > 0];
     Image img = sprite->sprite;
     int num = sprite->num;
-    int spriteNum = (dead) ? (int(Game::instance->time-startDeath)*7)%num : int(Game::instance->time*7)%num;
+    int spriteNum = (dead) ? (int(Game::instance->time-startDeath)*8)%num : int(Game::instance->time*7)%num;
     framebuffer.drawImage( img, position.x - camera.position.x + camera.half.x, position.y - camera.position.y + camera.half.y, Area(spriteNum*sprite->width, 0, sprite->width, sprite->height) );
+}
 
-    isUsed = !((spriteNum == num-1) && dead);
+void Enemy::drawDeath(Image& framebuffer, int spriteNum, const Camera& camera)
+{
+    Sprite* sprite = sprites[2];
+    Image img = sprite->sprite;
+
+    framebuffer.drawImage( sprite->sprite, position.x - camera.position.x + camera.half.x, position.y - camera.position.y + camera.half.y, Area(spriteNum*sprite->width, 0, sprite->width, sprite->height));    
+
+    isUsed = !((spriteNum == sprite->num-1));
 }
 
 bool Enemy::compare(Vector2 a, Vector2 b)
@@ -129,4 +137,12 @@ void PBullet::drawEntity(Image& framebuffer, const Camera& camera)
     int num = sprite->num;
     int spriteNum = int(Game::instance->time*7)%num;
     framebuffer.drawImage( img, position.x - camera.position.x + camera.half.x, position.y - camera.position.y + camera.half.y, Area(spriteNum*sprite->width, 0, sprite->width, sprite->height) );
+}
+
+void PBullet::drawEntity(Image& framebuffer, Vector2 v)
+{
+    Image img = sprite->sprite;
+    int num = sprite->num;
+    int spriteNum = int(Game::instance->time*7)%num;
+    framebuffer.drawImage( img, v.x, v.y, Area(spriteNum*sprite->width, 0, sprite->width, sprite->height) );
 }

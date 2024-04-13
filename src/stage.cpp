@@ -76,6 +76,10 @@ PlayingStage::PlayingStage()
 	for (int i = 0; i < MAX_BULLETS; ++i)  bullets[i] = new Bullet();
 	for (int i = 0; i < MAX_ENEMIES; ++i)  enemies[i] = new Enemy();
 
+	life = new Image();
+	life->loadTGA("../data/heart.tga");
+	rollInd = new Sprite("../data/rollCDIndicator.tga", 16, 16, 2);
+
 	player->loadTGA("../data/idleDown.tga" , 15, 20, 4, DOWN_FACING,  IDLE);
 	player->loadTGA("../data/idleUp.tga"   , 15, 20, 4, UP_FACING,    IDLE);
 	player->loadTGA("../data/idleRight.tga", 16, 20, 4, RIGHT_FACING, IDLE);
@@ -202,6 +206,10 @@ void PlayingStage::drawEnemies(Image& framebuffer)
 	{
 		if (e->isUsed) {
 			e->updatePos(*player, Game::instance->elapsed_time);
+			if (e->dead){
+				e->drawDeath(framebuffer, int((Game::instance->time-e->startDeath)*10)%e->sprites[2]->num, *camera);
+				continue;
+			}
 			e->drawEntity(framebuffer, *camera);
 		}
 	}
@@ -236,6 +244,10 @@ void PlayingStage::render(Image& framebuffer, const Image& minifont)
 	drawBullets( framebuffer);
 	drawEnemies( framebuffer);
 	drawPBullets(framebuffer);
+
+	for (int i = 0; i < player->life; ++i) framebuffer.drawImage( *life, 1 + 15*i, 5 );
+	if (!player->fireCD) PBullet::drawEntity(framebuffer, Vector2(1, framebuffer.height-10));
+	if (!player->rollCD) framebuffer.drawImage( rollInd->sprite, 11, framebuffer.height-16 , Area(int(Game::instance->time*5)%2*rollInd->width, 0, rollInd->width, rollInd->height));
 
 	framebuffer.drawText( "Kill count: " + toString(player->killCount), 1, 20, minifont, 4, 6 );
 	framebuffer.drawText( "Times snoozed: " + toString(player->killCount/10), 1, 30, minifont, 4, 6);
@@ -293,7 +305,7 @@ void PlayingStage::update(float seconds_elapsed)
 		playerSpeed.x -= 1;
 		player->direction = LEFT_FACING;
 	}
-	if (Input::wasKeyPressed(SDL_SCANCODE_X) && !player->fireCD)
+	if ((Input::wasKeyPressed(SDL_SCANCODE_X) || Input::isKeyPressed(SDL_SCANCODE_X)) && !player->fireCD)
 	{
 		Enemy* tmp = findClosestEnemy();
 		if (tmp != nullptr)
@@ -305,7 +317,7 @@ void PlayingStage::update(float seconds_elapsed)
 		else printf("No closest enemy\n");
 
 	}
-	if (Input::wasKeyPressed(SDL_SCANCODE_Z) && !player->rollCD)
+	if ((Input::wasKeyPressed(SDL_SCANCODE_Z) || Input::isKeyPressed(SDL_SCANCODE_Z)) && !player->rollCD)
 	{
 		player->rolling = true;
 		player->startRoll = Game::instance->time;
@@ -351,6 +363,7 @@ void PlayingStage::update(float seconds_elapsed)
 			player->isHit = true;
 			player->startHit = Game::instance->time;
 			player->life -= b->damage;
+			player->targetable = false;
 			b->isUsed = false;
 		}
 	}
@@ -392,8 +405,8 @@ void PlayingStage::update(float seconds_elapsed)
 		player->isHit = tmp;
 		player->targetable = !tmp;
 	}
-	if (Game::instance->time - currentTick > 10) {
-		currentTick = Game::instance->time;
+
+	if (Game::instance->time - currentTick > 3) {
 		generateEnemies();
 	}
 
@@ -402,11 +415,12 @@ void PlayingStage::update(float seconds_elapsed)
 
 void PlayingStage::generateEnemies()
 {
-	for (int i = 0; i < (Game::instance->time - startTime)/5 + rand()%5; ++i)
+	for (int i = 0; i < (Game::instance->time - startTime)/5 + 1; ++i)
 	{
 		Enemy* tmp = findFreeEnemy();
 		if (tmp) *tmp = Enemy(*player);
 	}
+	currentTick = Game::instance->time;
 }
 
 void PlayingStage::switchStage()

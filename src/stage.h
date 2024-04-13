@@ -2,7 +2,7 @@
 #define STAGE_H
 
 #define MAX_BULLETS 100
-#define MAX_ENEMIES 50
+#define MAX_ENEMIES 15
 
 #include <vector>
 #include "image.h"
@@ -14,6 +14,7 @@ class GameMap;
 class Bullet;
 class Enemy;
 class PBullet;
+class Sprite;
 
 enum eStages { INTRO_STAGE, PLAYING_STAGE, ENDING_STAGE };
 enum eEntity { eBULLET, eENEMY, ePBULLET };
@@ -48,6 +49,8 @@ class PlayingStage : public Stage
 {
 public:
     static PlayingStage* instance;
+    Image* life;
+    Sprite* rollInd;
     Player* player;
 
     std::vector<PBullet*> pBullets;

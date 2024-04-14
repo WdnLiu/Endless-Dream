@@ -223,20 +223,17 @@ void PlayingStage::render(Image& framebuffer, const Image& minifont)
 	if (player->revive)
 	{
 		player->animate(framebuffer, spriteNum, *camera, 1);
-		spriteNum = int((Game::instance->time - player->startRevive)*10)%player->reviveAnim->num;
 		return;
 	}
 	else if (player->dead)
 	{
 		player->animate(framebuffer, spriteNum, *camera, 0);
-		spriteNum = int((Game::instance->time - player->startDeath)*10)%player->deathAnim->num;
 		return;
 	}
 	else if (!player->isHit || (player->isHit && int(Game::instance->time*10)%2)){
 		if (player->rolling)
 		{
 			player->animateRoll(framebuffer, spriteNum, *camera);
-			spriteNum = int ((Game::instance->time - player->startRoll)*20) %9;
 		}
 		else player->animate(framebuffer, *camera);
 	}
@@ -276,10 +273,12 @@ void PlayingStage::update(float seconds_elapsed)
 {
 	if (player->dead) {
 		if (spriteNum == player->deathAnim->num-1) switchStage();
+		spriteNum = int((Game::instance->time - player->startDeath)*10)%player->deathAnim->num;
 		return;	
 	}
 	if (player->revive) {
 		player->revive = !(spriteNum == player->reviveAnim->num-1);
+		spriteNum = int((Game::instance->time - player->startRevive)*10)%player->reviveAnim->num;
 		return;
 	}
 
@@ -336,8 +335,6 @@ void PlayingStage::update(float seconds_elapsed)
 		player->startDeath = Game::instance->time;
 	}
 
-	target = player->position+playerSpeed;
-
 	if (playerSpeed.x != 0 && playerSpeed.y != 0) {
 		playerSpeed.normalize();
 	}
@@ -346,13 +343,10 @@ void PlayingStage::update(float seconds_elapsed)
 	}
 	else player->moving = false;
 
-	if (player->moving) {
-		player->position.x = clamp(player->position.x + playerSpeed.x*player->speed*seconds_elapsed, 15, 450);
-		player->position.y = clamp(player->position.y + playerSpeed.y*player->speed*seconds_elapsed, 0, 285);
+	if (player->rolling) {
+		spriteNum = int ((Game::instance->time - player->startRoll)*20) %9;
+		player->rolling = (spriteNum == player->sprites[2][player->direction]->num-1) ? false : true;
 	}
-	camera->position.x = clamp(player->position.x, 15, 500);
-	camera->position.y = clamp(player->position.y, 0, 335);
-
 	for (Bullet* b : bullets)
 	{
 		if (!player->targetable) break;
@@ -397,20 +391,34 @@ void PlayingStage::update(float seconds_elapsed)
 		player->dead = true;
 	}
 
-	if (!player->targetable) player->targetable = (Game::instance->time - player->startRoll > 1);
-	if (player->rollCD) player->rollCD = (int(Game::instance->time - player->startRoll) > 1) ? false : true;
-	if (player->fireCD) player->fireCD = (Game::instance->time - player->startFire < 0.5);
-	if (player->isHit) {
-		bool tmp = (Game::instance->time - player->startHit < 2);
-		player->isHit = tmp;
-		player->targetable = !tmp;
+	if (!player->targetable) 
+	{
+		if (player->isHit)
+		{
+			bool tmp = (Game::instance->time - player->startHit < 2);
+			player->isHit = tmp;
+			player->targetable = !tmp;
+		}
+		else
+		{
+			player->targetable = (Game::instance->time - player->startRoll > 0.5);
+		}
 	}
+	if (player->rollCD) player->rollCD = (int(Game::instance->time - player->startRoll) > (1-clamp(player->killCount/10*0.1, 0, 0.5))) ? false : true;
+	if (player->fireCD) player->fireCD = (Game::instance->time - player->startFire < (0.5-clamp(player->killCount/10*0.05,0, 0.25)));
 
 	if (Game::instance->time - currentTick > 3) {
 		generateEnemies();
 	}
 
 	player->speed = (player->rolling) ? 120.0f : 60.0f;
+	
+	if (player->moving) {
+		player->position.x = clamp(player->position.x + playerSpeed.x*player->speed*seconds_elapsed, 15, 450);
+		player->position.y = clamp(player->position.y + playerSpeed.y*player->speed*seconds_elapsed, 0, 285);
+	}
+	camera->position.x = clamp(player->position.x, 15, 500);
+	camera->position.y = clamp(player->position.y, 0, 335);
 }
 
 void PlayingStage::generateEnemies()

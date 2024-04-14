@@ -70,8 +70,6 @@ void Player::animateRoll(Image& framebuffer, int spriteNum, const Camera& camera
     Image img = sprite.sprite;
 
     framebuffer.drawImage( img, position.x - camera.position.x + camera.half.x, position.y - camera.position.y + camera.half.y, Area(spriteNum*sprite.width, 0, sprite.width, sprite.height) );
-
-    rolling = (spriteNum == sprite.num-1) ? false : true;
 }
 
 void Player::animate(Image& framebuffer, int spriteNum, const Camera& camera, int mode)
@@ -88,7 +86,7 @@ void Player::animate(Image& framebuffer, int spriteNum, const Camera& camera, in
 
 bool Player::compare(Vector2 a, Vector2 b)
 {
-    return (a.x-6 > b.x && a.x < b.x+size.x+6 && a.y-4 > b.y && a.y-8 < b.y+size.y);
+    return (a.x > b.x-2 && a.x < b.x+size.x && a.y > b.y && a.y < b.y+size.y-5);
 }
 
 bool Player::inHitbox(Bullet* b)

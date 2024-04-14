@@ -2,7 +2,7 @@
 #define STAGE_H
 
 #define MAX_BULLETS 100
-#define MAX_ENEMIES 15
+#define MAX_ENEMIES 20
 
 #include <vector>
 #include "image.h"

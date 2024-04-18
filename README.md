@@ -1,17 +1,9 @@
-# TJE2D
-A C++ simple 2D games framework, it just creates a window, reads input and allows to load/draw sprites.
+#Endless Dream
 
-It was created for the Game Development Course at Universitat Pompeu Fabra.
+A 2D game created for the course of Electronic Games @UPF 2024, based off the uncomplete engine they provided us. 
 
-It is based on SDL, runs on Windows, Mac and Linux.
+##Windows
+To run on windows simply unzip the EndlessDream.zip file and run the .exe
 
-## Install
-
-Check the [install guide](INSTALL.md) to know how to install it for windows, mac and linux.
-
-## Features
-
-- Load/Draw sprites
-- 3 voice synth with support for sample playback
-- Input for keyboard/mouse/gamepad
-
+##Linux (no sound support)
+Download the repository and compile with the cmake
